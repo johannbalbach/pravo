@@ -542,3 +542,77 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Fuel bar ──────────────────────────────────────────── */
+.fuel-section {
+  padding-bottom: var(--space-3);
+}
+
+.fuel-bar-wrap {
+  display: grid;
+  gap: 6px;
+}
+
+.fuel-segments {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+}
+
+.fuel-seg {
+  flex: 1;
+  border-radius: 2px;
+  background: rgba(44, 87, 127, 0.28);
+  border: 1px solid rgba(44, 87, 127, 0.45);
+  transition:
+    background 80ms ease,
+    border-color 80ms ease,
+    box-shadow 80ms ease;
+}
+
+.fuel-seg.lit {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 5px rgba(69, 214, 255, 0.45);
+}
+
+.fuel-seg.lit.low {
+  background: var(--warn);
+  border-color: var(--warn);
+  box-shadow: 0 0 5px rgba(255, 195, 114, 0.45);
+}
+
+.fuel-seg.lit.crit {
+  background: var(--bad);
+  border-color: var(--bad);
+  box-shadow: 0 0 5px rgba(255, 126, 126, 0.5);
+}
+
+.fuel-meta {
+  display: flex;
+  justify-content: space-between;
+}
+
+.fuel-pct {
+  font:
+    700 12px/1 "JetBrains Mono",
+    monospace;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  transition: color 120ms ease;
+}
+
+.fuel-pct.low {
+  color: var(--warn);
+}
+.fuel-pct.crit {
+  color: var(--bad);
+}
+
+.fuel-tof {
+  font:
+    500 11px/1 "JetBrains Mono",
+    monospace;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}

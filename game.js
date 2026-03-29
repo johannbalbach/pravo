@@ -68,6 +68,7 @@
   const WIND = 2;
   const WIND_ACCEL = -WIND * 0.015;
   const MAX_LOG_ITEMS = 84;
+  const FUEL_SEGS = 24;
 
   const PHASE_LABELS = {
     select: "ВЫБОР ЦЕЛИ",
@@ -138,6 +139,9 @@
     hud: document.getElementById("hud"),
     hudToggle: document.getElementById("hud-toggle"),
     hudBackdrop: document.getElementById("hud-backdrop"),
+    fuelSegments: document.getElementById("fuel-segments"),
+    fuelPct: document.getElementById("fuel-pct"),
+    fuelTof: document.getElementById("fuel-tof"),
   };
 
   const ctx = els.canvas.getContext("2d");
@@ -162,6 +166,8 @@
     targets: [],
     projectile: null,
     effects: [],
+    fuelPct: 0,
+    fuelTof: 0,
   };
 
   let width = 0;
@@ -188,6 +194,49 @@
     const mm = String(Math.floor(safe / 60)).padStart(2, "0");
     const ss = String(safe % 60).padStart(2, "0");
     return `${mm}:${ss}`;
+  }
+
+  function initFuelBar() {
+    els.fuelSegments.innerHTML = "";
+    for (let i = 0; i < FUEL_SEGS; i++) {
+      const seg = document.createElement("div");
+      seg.className = "fuel-seg";
+      els.fuelSegments.appendChild(seg);
+    }
+    updateFuelBar(0, 0);
+  }
+
+  function updateFuelBar(pct, remainingSec) {
+    state.fuelPct = Math.max(0, Math.min(1, pct));
+    const lit = Math.round(state.fuelPct * FUEL_SEGS);
+    const segs = els.fuelSegments.querySelectorAll(".fuel-seg");
+    segs.forEach((seg, i) => {
+      const on = i < lit;
+      let cls = "fuel-seg";
+      if (on) {
+        if (i < FUEL_SEGS * 0.25) cls += " lit crit";
+        else if (i < FUEL_SEGS * 0.55) cls += " lit low";
+        else cls += " lit";
+      }
+      seg.className = cls;
+    });
+
+    if (pct <= 0) {
+      els.fuelPct.textContent = "—";
+      els.fuelPct.className = "fuel-pct";
+      els.fuelTof.textContent = "TOF —";
+    } else {
+      const pctRound = Math.round(pct * 100);
+      els.fuelPct.textContent = `${pctRound}%`;
+      els.fuelPct.className =
+        pctRound <= 25
+          ? "fuel-pct crit"
+          : pctRound <= 55
+            ? "fuel-pct low"
+            : "fuel-pct";
+      els.fuelTof.textContent =
+        remainingSec > 0 ? `TOF ${remainingSec.toFixed(1)}с` : "TOF —";
+    }
   }
 
   function gaussian(mean, stdDev) {
@@ -453,6 +502,8 @@
     syncHUD();
     syncFireButton();
 
+    updateFuelBar(1, timeOfFlight(dist));
+
     log(
       `[ОГОНЬ] Выстрел по ${target.name.split("—")[0].trim()}. Упреждение ${lead.toFixed(0)} м.`,
       "warn",
@@ -466,6 +517,7 @@
   function finishShot(result) {
     state.firing = false;
     state.projectile = null;
+    updateFuelBar(0, 0);
 
     if (result.isHit) {
       result.target.isDestroyed = true;
@@ -661,6 +713,7 @@
 
     if (projectile.my <= 0 && projectile.age > 0.2) {
       projectile.active = false;
+      updateFuelBar(0, 0);
       resolveImpact(projectile);
     }
   }
@@ -689,6 +742,14 @@
     updateMovingTargets(dt);
     updateProjectile(dt);
     updateEffects(dt);
+
+    if (state.projectile && state.projectile.active) {
+      const tgt = getTarget(state.projectile.targetId);
+      const totalTof = tgt ? timeOfFlight(state.projectile.distAtFire) : 1;
+      const remaining = Math.max(0, totalTof - state.projectile.age);
+      const pct = remaining / totalTof;
+      updateFuelBar(pct, remaining);
+    }
 
     if (state.phase === "ballistics" && state.ballisticsTicker > 0.22) {
       state.ballisticsTicker = 0;
@@ -1120,6 +1181,7 @@
     renderTargetsList();
     syncHUD();
     syncFireButton();
+    initFuelBar();
 
     els.victory.classList.remove("on");
     els.victoryScore.textContent = "0";
