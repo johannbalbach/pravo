@@ -1,0 +1,108 @@
+﻿<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2С35 Коалиция-СВ | Tactical Minimal HUD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="game" class="app">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <p class="kicker">TACTICAL HUD</p>
+          <h1 class="brand">COALITION-SV / 2С35</h1>
+        </div>
+
+        <div class="top-meta" aria-label="параметры среды">
+          <span class="meta-chip">Ветер 2м/с ←</span>
+          <span class="meta-chip">Влажн. 70%</span>
+        </div>
+
+        <div class="phase-wrap">
+          <span class="phase-label">ФАЗА</span>
+          <span id="phase-badge" class="phase-badge">ВЫБОР ЦЕЛИ</span>
+        </div>
+      </header>
+
+      <main id="layout" class="layout">
+        <section id="scene-shell" class="scene-shell" aria-label="Боевая сцена">
+          <canvas id="scene"></canvas>
+          <div id="impact-flash" class="impact-flash" aria-hidden="true"></div>
+
+          <div id="scene-overlay" class="scene-overlay">
+            <div class="overlay-item">
+              <span class="overlay-key">Наведение</span>
+              <span id="overlay-target" class="overlay-val">Ожидание выбора</span>
+            </div>
+            <div class="overlay-item">
+              <span class="overlay-key">Расстояние</span>
+              <span id="overlay-distance" class="overlay-val">-- км</span>
+            </div>
+            <div class="overlay-item">
+              <span class="overlay-key">Время миссии</span>
+              <span id="overlay-time" class="overlay-val">00:00</span>
+            </div>
+          </div>
+
+          <div id="victory" class="victory" role="dialog" aria-modal="true" aria-labelledby="victory-title">
+            <p class="victory-kicker">МИССИЯ ЗАВЕРШЕНА</p>
+            <h2 id="victory-title">Все цели подавлены</h2>
+            <div class="victory-score-wrap">
+              <span class="victory-score-label">Итоговые очки</span>
+              <span id="victory-score" class="victory-score">0</span>
+            </div>
+            <button id="restart-btn" class="btn btn-secondary" type="button">Новая миссия</button>
+          </div>
+        </section>
+
+        <div id="hud-backdrop" class="hud-backdrop" hidden></div>
+
+        <aside id="hud" class="hud" aria-label="Панель управления">
+          <button id="hud-toggle" class="hud-toggle" type="button" aria-expanded="false">
+            Цели и расчёт
+          </button>
+
+          <div class="hud-body">
+            <section class="hud-section status">
+              <h3>Статус орудия</h3>
+              <div class="data-row"><span>Боезапас</span><strong id="ammo">6</strong></div>
+              <div class="data-row"><span>Состояние</span><strong id="status" class="tone-ok">ГОТОВО</strong></div>
+              <div class="data-row"><span>Очки</span><strong id="score" class="tone-warn">0</strong></div>
+            </section>
+
+            <section class="hud-section ballistics" id="ballistics-section">
+              <h3>Баллистика</h3>
+              <div id="ballistics" class="ballistics-grid">
+                <p class="placeholder">Выберите цель для расчёта траектории.</p>
+              </div>
+            </section>
+
+            <section class="hud-section targets">
+              <h3>Цели</h3>
+              <div id="targets-list" class="targets-list"></div>
+            </section>
+
+            <section class="hud-section actions">
+              <button id="fire-btn" class="btn btn-primary" type="button" disabled>ОГОНЬ</button>
+            </section>
+
+            <section class="hud-section feed">
+              <h3>Журнал</h3>
+              <div id="event-log" class="event-log" role="log" aria-live="polite"></div>
+            </section>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="./game.js"></script>
+  </body>
+</html>
