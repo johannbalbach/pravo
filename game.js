@@ -641,7 +641,8 @@
     const scatter = gaussian(0, profile.cep * 0.72);
     const missDistance = Math.abs(dynamicError + scatter);
     const chanceRoll = Math.random();
-    const isHit = missDistance <= profile.threshold && chanceRoll <= profile.chance;
+    //const isHit = missDistance <= profile.threshold && chanceRoll <= profile.chance;
+    const isHit = true;
 
     state.effects.push({
       mx: projectile.mx,
